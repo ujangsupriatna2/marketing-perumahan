@@ -3,13 +3,11 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  outputFileTracingRoot: path.join(__dirname),
   typescript: {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  experimental: {
-    outputFileTracingRoot: path.join(__dirname),
-  },
 };
 
 export default nextConfig;
