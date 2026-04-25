@@ -167,7 +167,8 @@ function fallbackResponse(message: string): string {
     const sorted = [...PROPS].sort((a, b) => a.price - b.price);
     const cheapest = sorted[0];
     const ci = getCheapestInstallment(cheapest);
-    const featureStr = cheapest.features.length > 0 ? cheapest.features.join(", ") : "-";
+    const feats = Array.isArray(cheapest.features) ? cheapest.features : typeof cheapest.features === "string" ? safeJsonParse<string[]>(cheapest.features, []) : [];
+    const featureStr = feats.length > 0 ? feats.join(", ") : "-";
     return `🏠 **Properti Termurah: ${cheapest.name}**\n\n• Tipe: **${cheapest.type}** (${cheapest.bedrooms} KT / ${cheapest.bathrooms} KM)\n• Harga: **Rp ${formatRp(cheapest.price)}**\n• Lokasi: ${cheapest.location}\n• Kategori: ${cheapest.category}\n• Fitur: ${featureStr}\n\n💰 Cicilan termurah (DP ${ci.dp}%, tenor ${ci.tenor} tahun):\n**Rp ${formatRp(ci.monthly)}/bulan** (FLAT, tanpa riba)${getContactFooter()}`;
   }
 
@@ -181,7 +182,8 @@ function fallbackResponse(message: string): string {
   );
   if (prop) {
     const ci = getCheapestInstallment(prop);
-    const featureStr = prop.features.length > 0 ? prop.features.join(", ") : "-";
+    const feats = Array.isArray(prop.features) ? prop.features : typeof prop.features === "string" ? safeJsonParse<string[]>(prop.features, []) : [];
+    const featureStr = feats.length > 0 ? feats.join(", ") : "-";
     const tenorStr = prop.tenorOptions.map(String).join(", ");
     const dpStr = prop.dpOptions.map((d) => d + "%").join(", ");
     const financeStr = prop.financingTypes.map((f) => f === "syariah" ? "Syariah" : "KPR").join(" & ");
