@@ -85,6 +85,7 @@ interface Property {
   kprInstallments: string;
   isFeatured: boolean;
   mitraId: string | null;
+  mitra?: { id: string; name: string } | null;
   createdAt: string;
 }
 
@@ -524,6 +525,7 @@ export default function ProyekPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterMitra, setFilterMitra] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editing, setEditing] = useState<Property | null>(null);
@@ -547,13 +549,16 @@ export default function ProyekPage() {
 
   const fetchProperties = useCallback(async () => {
     try {
-      const q = search ? `?search=${encodeURIComponent(search)}` : "";
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (filterMitra) params.set("mitraId", filterMitra);
+      const q = params.toString() ? `?${params.toString()}` : "";
       const res = await fetch(`/api/admin/properties${q}`);
       const data = await res.json();
       setProperties(data.properties || []);
     } catch { /* ignore */ }
     setLoading(false);
-  }, [search]);
+  }, [search, filterMitra]);
 
   useEffect(() => { fetchProperties(); }, [fetchProperties]);
   useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
@@ -687,15 +692,30 @@ export default function ProyekPage() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input
-          placeholder="Cari proyek..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-        />
+      {/* Search + Filter */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="Cari proyek..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        {isSuperAdmin && mitraList.length > 0 && (
+          <Select value={filterMitra || "all"} onValueChange={(v) => setFilterMitra(v === "all" ? "" : v)}>
+            <SelectTrigger className="w-full sm:w-56">
+              <SelectValue placeholder="Filter mitra..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Mitra</SelectItem>
+              {mitraList.map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <Card className="border-0 shadow-sm">
@@ -703,6 +723,7 @@ export default function ProyekPage() {
             <Table containerClassName="max-h-[calc(100vh-14rem)]">
               <TableHeader className="sticky top-0 z-10 bg-gray-50">
                 <TableRow className="bg-gray-50">
+                  {isSuperAdmin && <TableHead>Mitra</TableHead>}
                   <TableHead>Nama</TableHead>
                   <TableHead>Tipe</TableHead>
                   <TableHead>Kategori</TableHead>
@@ -715,6 +736,7 @@ export default function ProyekPage() {
                 {loading
                   ? Array.from({ length: 5 }).map((_, i) => (
                       <TableRow key={i}>
+                        {isSuperAdmin && <TableCell><Skeleton className="h-4 w-24" /></TableCell>}
                         <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                         <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                         <TableCell><Skeleton className="h-4 w-16" /></TableCell>
@@ -726,7 +748,7 @@ export default function ProyekPage() {
                   : properties.length === 0
                   ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-10 text-gray-400">
+                        <TableCell colSpan={isSuperAdmin ? 7 : 6} className="text-center py-10 text-gray-400">
                           <Building2 className="w-10 h-10 mx-auto mb-2 text-gray-300" />
                           {search ? "Tidak ada hasil" : "Belum ada proyek"}
                         </TableCell>
@@ -737,6 +759,15 @@ export default function ProyekPage() {
                       const catLabel = CATEGORY_MAP[p.category] || p.category;
                       return (
                         <TableRow key={p.id} className="hover:bg-gray-50">
+                          {isSuperAdmin && (
+                            <TableCell>
+                              {p.mitra ? (
+                                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">{p.mitra.name}</span>
+                              ) : (
+                                <span className="text-xs text-gray-400">—</span>
+                              )}
+                            </TableCell>
+                          )}
                           <TableCell>
                             <div className="flex items-center gap-2">
                               {p.images && parseImages(p.images)[0] ? (
