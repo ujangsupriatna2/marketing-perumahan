@@ -2160,10 +2160,10 @@ function CalculatorSection() {
         </FadeIn>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
           <FadeIn direction="left">
-            <Card className="border-0 shadow-xl">
-              <CardContent className="p-6 md:p-8 space-y-6">
+            <Card className="border-0 shadow-xl min-w-0">
+              <CardContent className="p-5 md:p-8 space-y-5 md:space-y-6">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 mb-2 block">
                     Pilih Properti
@@ -2271,13 +2271,13 @@ function CalculatorSection() {
           </FadeIn>
 
           <FadeIn direction="right">
-            <Card className="border-0 shadow-xl text-white bg-gradient-to-br from-red-600 to-red-700">
-              <CardContent className="p-6 md:p-8">
+            <Card className="border-0 shadow-xl text-white bg-gradient-to-br from-red-600 to-red-700 min-w-0">
+              <CardContent className="p-5 md:p-8">
                 <div className="text-center mb-8">
                   <p className="text-red-200 text-sm uppercase tracking-wider mb-2">
                     Cicilan Bulanan
                   </p>
-                  <p className="text-4xl md:text-5xl font-extrabold">
+                  <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold break-all sm:break-normal">
                     Rp {formatRp(monthly * 1_000_000)}
                   </p>
                   <p className="text-red-200 text-sm mt-2">
