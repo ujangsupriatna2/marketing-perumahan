@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Plus, Pencil, Trash2, Search, LandPlot, Loader2, AlertCircle, Building2 } from "lucide-react";
 import ImageUpload from "@/components/admin/image-upload";
 import { toast } from "sonner";
@@ -29,12 +30,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
 interface BankItem {
@@ -44,15 +43,22 @@ interface BankItem {
   image: string;
   sortOrder: number;
   isActive: boolean;
+  mitraId: string | null;
+  mitra?: { id: string; name: string } | null;
   createdAt: string;
 }
 
-const emptyForm = { name: "", description: "", image: "", sortOrder: "0", isActive: true };
+interface MitraOption { id: string; name: string; }
+
+const emptyForm = { name: "", description: "", image: "", sortOrder: "0", isActive: true, mitraId: "" };
 
 export default function BankPage() {
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "superadmin";
   const [items, setItems] = useState<BankItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterMitra, setFilterMitra] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editing, setEditing] = useState<BankItem | null>(null);
@@ -60,10 +66,25 @@ export default function BankPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mitraList, setMitraList] = useState<MitraOption[]>([]);
+
+  const fetchMitraList = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/mitra?limit=100");
+      if (res.ok) {
+        const data = await res.json();
+        const raw = data.mitra ?? data;
+        setMitraList(Array.isArray(raw) ? raw.map((m: { id: string; name: string }) => ({ id: m.id, name: m.name })) : []);
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const fetchBanks = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/bank");
+      const params = new URLSearchParams();
+      if (filterMitra) params.set("mitraId", filterMitra);
+      const q = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetch(`/api/admin/bank${q}`);
       const data = await res.json();
       let list = data.items || [];
       if (search) {
@@ -73,13 +94,14 @@ export default function BankPage() {
       setItems(list);
     } catch { /* ignore */ }
     setLoading(false);
-  }, [search]);
+  }, [search, filterMitra]);
 
   useEffect(() => { fetchBanks(); }, [fetchBanks]);
+  useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
 
   const openCreate = () => {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, mitraId: (session?.user as { mitraId?: string })?.mitraId || "" });
     setErrors({});
     setFormOpen(true);
   };
@@ -92,6 +114,7 @@ export default function BankPage() {
       image: b.image,
       sortOrder: String(b.sortOrder),
       isActive: b.isActive,
+      mitraId: b.mitraId || "",
     });
     setErrors({});
     setFormOpen(true);
@@ -126,7 +149,7 @@ export default function BankPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, mitraId: form.mitraId || null }),
       });
       if (!res.ok) { toast.error("Gagal menyimpan"); return; }
       toast.success(editing ? "Bank berhasil diupdate" : "Bank berhasil ditambahkan");
@@ -159,9 +182,24 @@ export default function BankPage() {
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input placeholder="Cari bank..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input placeholder="Cari bank..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        {isSuperAdmin && mitraList.length > 0 && (
+          <Select value={filterMitra || "all"} onValueChange={(v) => setFilterMitra(v === "all" ? "" : v)}>
+            <SelectTrigger className="w-full sm:w-56">
+              <SelectValue placeholder="Filter mitra..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Mitra</SelectItem>
+              {mitraList.map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <Card className="border-0 shadow-sm">
@@ -169,6 +207,7 @@ export default function BankPage() {
           <Table containerClassName="max-h-[calc(100vh-14rem)]">
             <TableHeader className="sticky top-0 z-10 bg-gray-50">
               <TableRow className="bg-gray-50">
+                {isSuperAdmin && <TableHead>Mitra</TableHead>}
                 <TableHead className="w-12">#</TableHead>
                 <TableHead>Logo</TableHead>
                 <TableHead>Nama Bank</TableHead>
@@ -181,6 +220,7 @@ export default function BankPage() {
               {loading
                 ? Array.from({ length: 4 }).map((_, i) => (
                     <TableRow key={i}>
+                      {isSuperAdmin && <TableCell><Skeleton className="h-4 w-24" /></TableCell>}
                       <TableCell><Skeleton className="h-4 w-6" /></TableCell>
                       <TableCell><Skeleton className="h-12 w-16 rounded-lg" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-28" /></TableCell>
@@ -192,7 +232,7 @@ export default function BankPage() {
                 : items.length === 0
                 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-10 text-gray-400">
+                      <TableCell colSpan={isSuperAdmin ? 7 : 6} className="text-center py-10 text-gray-400">
                         <Building2 className="w-10 h-10 mx-auto mb-2 text-gray-300" />
                         {search ? "Tidak ada hasil" : "Belum ada data bank"}
                       </TableCell>
@@ -200,6 +240,15 @@ export default function BankPage() {
                   )
                 : items.map((item) => (
                     <TableRow key={item.id} className="hover:bg-gray-50">
+                      {isSuperAdmin && (
+                        <TableCell>
+                          {item.mitra ? (
+                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">{item.mitra.name}</span>
+                          ) : (
+                            <span className="text-xs text-gray-400">—</span>
+                          )}
+                        </TableCell>
+                      )}
                       <TableCell>
                         <span className="text-xs font-mono text-gray-400">{item.sortOrder}</span>
                       </TableCell>
@@ -258,6 +307,21 @@ export default function BankPage() {
             <DialogTitle>{editing ? "Edit Bank" : "Tambah Bank Baru"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
+            {isSuperAdmin && (
+              <div className="space-y-2">
+                <Label>Mitra Perumahan</Label>
+                <Select value={form.mitraId || "none"} onValueChange={(v) => setForm({ ...form, mitraId: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="Pilih mitra..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa Mitra</SelectItem>
+                    {mitraList.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-gray-400">Assign bank ke mitra tertentu.</p>
+              </div>
+            )}
             <div className="space-y-2">
               <Label>
                 Nama Bank <span className="text-red-500">*</span>

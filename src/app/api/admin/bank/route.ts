@@ -22,6 +22,9 @@ export async function GET(req: Request) {
         orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
         skip: (page - 1) * limit,
         take: limit,
+        include: {
+          mitra: { select: { id: true, name: true } },
+        },
       }),
       db.bank.count({ where }),
     ]);

@@ -59,6 +59,7 @@ interface BlogPost {
   published: boolean;
   readTime: string;
   mitraId: string | null;
+  mitra?: { id: string; name: string } | null;
   createdAt: string;
 }
 
@@ -79,6 +80,7 @@ export default function BlogPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterMitra, setFilterMitra] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editing, setEditing] = useState<BlogPost | null>(null);
@@ -101,13 +103,16 @@ export default function BlogPage() {
 
   const fetchBlogs = useCallback(async () => {
     try {
-      const q = search ? `?search=${encodeURIComponent(search)}` : "";
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (filterMitra) params.set("mitraId", filterMitra);
+      const q = params.toString() ? `?${params.toString()}` : "";
       const res = await fetch(`/api/admin/blogs${q}`);
       const data = await res.json();
       setBlogs(data.blogs || []);
     } catch { /* ignore */ }
     setLoading(false);
-  }, [search]);
+  }, [search, filterMitra]);
 
   useEffect(() => { fetchBlogs(); }, [fetchBlogs]);
   useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
@@ -198,9 +203,24 @@ export default function BlogPage() {
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input placeholder="Cari artikel..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input placeholder="Cari artikel..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        {isSuperAdmin && mitraList.length > 0 && (
+          <Select value={filterMitra || "all"} onValueChange={(v) => setFilterMitra(v === "all" ? "" : v)}>
+            <SelectTrigger className="w-full sm:w-56">
+              <SelectValue placeholder="Filter mitra..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Mitra</SelectItem>
+              {mitraList.map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <Card className="border-0 shadow-sm">
@@ -208,6 +228,7 @@ export default function BlogPage() {
             <Table containerClassName="max-h-[calc(100vh-14rem)]">
               <TableHeader className="sticky top-0 z-10 bg-gray-50">
                 <TableRow className="bg-gray-50">
+                  {isSuperAdmin && <TableHead>Mitra</TableHead>}
                   <TableHead>Judul</TableHead>
                   <TableHead>Kategori</TableHead>
                   <TableHead>Author</TableHead>
@@ -220,6 +241,7 @@ export default function BlogPage() {
                 {loading
                   ? Array.from({ length: 4 }).map((_, i) => (
                       <TableRow key={i}>
+                        {isSuperAdmin && <TableCell><Skeleton className="h-4 w-24" /></TableCell>}
                         <TableCell><Skeleton className="h-4 w-48" /></TableCell>
                         <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                         <TableCell><Skeleton className="h-4 w-24" /></TableCell>
@@ -231,7 +253,7 @@ export default function BlogPage() {
                   : blogs.length === 0
                   ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-10 text-gray-400">
+                        <TableCell colSpan={isSuperAdmin ? 7 : 6} className="text-center py-10 text-gray-400">
                           <FileText className="w-10 h-10 mx-auto mb-2 text-gray-300" />
                           {search ? "Tidak ada hasil" : "Belum ada artikel"}
                         </TableCell>
@@ -239,6 +261,15 @@ export default function BlogPage() {
                     )
                   : blogs.map((b) => (
                       <TableRow key={b.id} className="hover:bg-gray-50">
+                        {isSuperAdmin && (
+                          <TableCell>
+                            {b.mitra ? (
+                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">{b.mitra.name}</span>
+                            ) : (
+                              <span className="text-xs text-gray-400">—</span>
+                            )}
+                          </TableCell>
+                        )}
                         <TableCell>
                           <p className="font-medium text-gray-900">{b.title}</p>
                           <p className="text-xs text-gray-400">{b.readTime} baca</p>

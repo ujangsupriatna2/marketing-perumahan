@@ -52,6 +52,7 @@ interface GalleryItem {
   description: string;
   sortOrder: number;
   mitraId: string | null;
+  mitra?: { id: string; name: string } | null;
   createdAt: string;
 }
 
@@ -65,6 +66,7 @@ export default function GalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterMitra, setFilterMitra] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editing, setEditing] = useState<GalleryItem | null>(null);
@@ -87,7 +89,10 @@ export default function GalleryPage() {
 
   const fetchGallery = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/gallery");
+      const params = new URLSearchParams();
+      if (filterMitra) params.set("mitraId", filterMitra);
+      const q = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetch(`/api/admin/gallery${q}`);
       const data = await res.json();
       let list = data.items || [];
       if (search) {
@@ -99,7 +104,7 @@ export default function GalleryPage() {
       setItems(list);
     } catch { /* ignore */ }
     setLoading(false);
-  }, [search]);
+  }, [search, filterMitra]);
 
   useEffect(() => { fetchGallery(); }, [fetchGallery]);
   useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
@@ -187,9 +192,24 @@ export default function GalleryPage() {
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <Input placeholder="Cari gallery..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input placeholder="Cari gallery..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        {isSuperAdmin && mitraList.length > 0 && (
+          <Select value={filterMitra || "all"} onValueChange={(v) => setFilterMitra(v === "all" ? "" : v)}>
+            <SelectTrigger className="w-full sm:w-56">
+              <SelectValue placeholder="Filter mitra..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Mitra</SelectItem>
+              {mitraList.map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <Card className="border-0 shadow-sm">
@@ -197,6 +217,7 @@ export default function GalleryPage() {
             <Table containerClassName="max-h-[calc(100vh-14rem)]">
               <TableHeader className="sticky top-0 z-10 bg-gray-50">
                 <TableRow className="bg-gray-50">
+                  {isSuperAdmin && <TableHead>Mitra</TableHead>}
                   <TableHead className="w-12">#</TableHead>
                   <TableHead>Preview</TableHead>
                   <TableHead>Judul</TableHead>
@@ -209,6 +230,7 @@ export default function GalleryPage() {
                 {loading
                   ? Array.from({ length: 4 }).map((_, i) => (
                       <TableRow key={i}>
+                        {isSuperAdmin && <TableCell><Skeleton className="h-4 w-24" /></TableCell>}
                         <TableCell><Skeleton className="h-4 w-6" /></TableCell>
                         <TableCell><Skeleton className="h-12 w-16 rounded-lg" /></TableCell>
                         <TableCell><Skeleton className="h-4 w-28" /></TableCell>
@@ -220,7 +242,7 @@ export default function GalleryPage() {
                   : items.length === 0
                   ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-10 text-gray-400">
+                        <TableCell colSpan={isSuperAdmin ? 7 : 6} className="text-center py-10 text-gray-400">
                           <ImageIcon className="w-10 h-10 mx-auto mb-2 text-gray-300" />
                           {search ? "Tidak ada hasil" : "Belum ada item gallery"}
                         </TableCell>
@@ -228,6 +250,15 @@ export default function GalleryPage() {
                     )
                   : items.map((item) => (
                       <TableRow key={item.id} className="hover:bg-gray-50">
+                        {isSuperAdmin && (
+                          <TableCell>
+                            {item.mitra ? (
+                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">{item.mitra.name}</span>
+                            ) : (
+                              <span className="text-xs text-gray-400">—</span>
+                            )}
+                          </TableCell>
+                        )}
                         <TableCell>
                           <span className="text-xs font-mono text-gray-400">{item.sortOrder}</span>
                         </TableCell>

@@ -38,6 +38,9 @@ export async function GET(req: Request) {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
         take: limit,
+        include: {
+          mitra: { select: { id: true, name: true } },
+        },
       }),
       db.blogPost.count({ where }),
     ]);
