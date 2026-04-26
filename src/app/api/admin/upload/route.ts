@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
+import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 
 export const runtime = "nodejs";
 
 const MAX_SIZE = 300 * 1024; // 300KB
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(process.cwd(), "uploads");
+const BUCKET_NAME = "uploads";
 const ALLOWED_TYPES = [
   "image/jpeg",
   "image/png",
@@ -16,6 +14,17 @@ const ALLOWED_TYPES = [
   "image/bmp",
   "image/tiff",
 ];
+
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Missing Supabase environment variables");
+  }
+
+  return createClient(supabaseUrl, supabaseKey);
+}
 
 function generateFilename(ext: string): string {
   const timestamp = Date.now();
@@ -71,8 +80,17 @@ async function compressImage(buffer: Buffer, mimeType: string): Promise<Buffer> 
 
 export async function POST(request: NextRequest) {
   try {
-    if (!existsSync(UPLOAD_DIR)) {
-      await mkdir(UPLOAD_DIR, { recursive: true });
+    const supabase = getSupabaseAdmin();
+
+    // Ensure bucket exists
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const bucketExists = buckets?.some((b) => b.name === BUCKET_NAME);
+
+    if (!bucketExists) {
+      await supabase.storage.createBucket(BUCKET_NAME, {
+        public: true,
+        fileSizeLimit: 5242880, // 5MB raw file limit (before compression)
+      });
     }
 
     const formData = await request.formData();
@@ -92,7 +110,7 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Compress image
+    // Compress image (max 300KB)
     const compressedBuffer = await compressImage(buffer, file.type);
 
     // Determine final extension
@@ -101,9 +119,24 @@ export async function POST(request: NextRequest) {
     const finalExt = isPng ? "png" : isWebp ? "webp" : "jpg";
 
     const filename = generateFilename(finalExt);
-    const filepath = path.join(UPLOAD_DIR, filename);
+    const contentType = isPng ? "image/png" : isWebp ? "image/webp" : "image/jpeg";
 
-    await writeFile(filepath, compressedBuffer);
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(filename, compressedBuffer, {
+        contentType,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("[Upload Error] Supabase:", uploadError);
+      return NextResponse.json({ error: "Gagal mengupload ke storage" }, { status: 500 });
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filename);
+    const publicUrl = urlData.publicUrl;
 
     const originalSizeKB = (buffer.length / 1024).toFixed(1);
     const compressedSizeKB = (compressedBuffer.length / 1024).toFixed(1);
@@ -114,7 +147,7 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json({
-      url: `/api/uploads/${filename}`,
+      url: publicUrl,
       filename,
       originalSize: buffer.length,
       compressedSize: compressedBuffer.length,
