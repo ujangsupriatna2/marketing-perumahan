@@ -2162,8 +2162,8 @@ function CalculatorSection() {
 
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto items-start">
           <FadeIn direction="left">
-            <Card className="border-0 shadow-xl min-w-0">
-              <CardContent className="p-5 md:p-8 space-y-5 md:space-y-6">
+            <Card className="border-0 shadow-xl min-w-0 overflow-hidden">
+              <CardContent className="p-4 sm:p-5 md:p-8 space-y-4 md:space-y-6">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 mb-2 block">
                     Pilih Properti
@@ -2240,19 +2240,19 @@ function CalculatorSection() {
                     <Label className="text-sm font-semibold text-gray-700 mb-2 block">
                       Tenor KPR: {tenor} Tahun
                     </Label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {tenorOptions.map((yr) => (
                         <button
                           key={yr}
                           type="button"
                           onClick={() => setTenor(String(yr))}
-                          className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                          className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
                             tenorNum === yr
                               ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-200"
                               : "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"
                           }`}
                         >
-                          {yr} Tahun
+                          {yr} Thn
                         </button>
                       ))}
                     </div>
@@ -2271,13 +2271,13 @@ function CalculatorSection() {
           </FadeIn>
 
           <FadeIn direction="right">
-            <Card className="border-0 shadow-xl text-white bg-gradient-to-br from-red-600 to-red-700 min-w-0">
-              <CardContent className="p-5 md:p-8">
-                <div className="text-center mb-8">
-                  <p className="text-red-200 text-sm uppercase tracking-wider mb-2">
+            <Card className="border-0 shadow-xl text-white bg-gradient-to-br from-red-600 to-red-700 min-w-0 overflow-hidden">
+              <CardContent className="p-4 sm:p-5 md:p-8">
+                <div className="text-center mb-6 md:mb-8">
+                  <p className="text-red-200 text-xs sm:text-sm uppercase tracking-wider mb-2">
                     Cicilan Bulanan
                   </p>
-                  <p className="text-2xl sm:text-3xl md:text-5xl font-extrabold">
+                  <p className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-extrabold break-words leading-tight">
                     Rp {formatRp(monthly * 1_000_000)}
                   </p>
                   <p className="text-red-200 text-sm mt-2">
@@ -2290,16 +2290,16 @@ function CalculatorSection() {
 
                 <Separator className="bg-white/20 mb-6" />
 
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {[
                     { label: "Harga Rumah", value: `Rp ${prop ? formatRp(prop.price * 1_000_000) : "0"}` },
                     { label: `Uang Muka (${dp}%)`, value: `Rp ${formatRp(dpAmount * 1_000_000)}` },
                     { label: "Sisa Pembayaran", value: `Rp ${formatRp(remaining * 1_000_000)}` },
                     { label: `Tenor (${tenor} tahun)`, value: `${tenorNum * 12} bulan` },
                   ].map((row) => (
-                    <div key={row.label} className="flex justify-between items-center gap-2 min-w-0">
-                      <span className="text-red-200 text-xs sm:text-sm whitespace-nowrap">{row.label}</span>
-                      <span className="font-bold text-sm sm:text-base text-right truncate">{row.value}</span>
+                    <div key={row.label} className="flex flex-col xs:flex-row xs:justify-between xs:items-center gap-0.5 min-w-0">
+                      <span className="text-red-200 text-[11px] sm:text-xs md:text-sm">{row.label}</span>
+                      <span className="font-bold text-xs sm:text-sm md:text-base break-words">{row.value}</span>
                     </div>
                   ))}
                 </div>
