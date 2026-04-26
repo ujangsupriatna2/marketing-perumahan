@@ -38,3 +38,26 @@ Stage Summary:
 - Admin login: admin@brr.co.id / admin123
 - Public website: Hero, Features, Properties, Calculator, Location, FAQ, Gallery, Blog, Contact, Chatbot
 - Admin panel: Dashboard, Proyek, Blog, Testimoni, Kalkulator, Gallery, Bank, Pengaturan, Users
+
+---
+Task ID: 2
+Agent: Main
+Task: Fix calculator card responsiveness when data is present
+
+Work Log:
+- Investigated the CalculatorSection component (line 2018 in page.tsx)
+- Identified root cause: Large formatted numbers (e.g. "Rp 5.123.456.789") at text-3xl/4xl/5xl font sizes are treated as unbreakable strings, forcing cards wider than their grid column allocation
+- Applied fixes:
+  1. Added scoped CSS (`#simulasi .calc-card .num-val { overflow-wrap: anywhere; }`) to allow numbers to break at any character
+  2. Added `calc-card` class to both input and result cards with `overflow: hidden`
+  3. Added `overflow-hidden` to CardContent on both cards
+  4. Added `num-val` class to the main monthly amount and detail value spans
+  5. Changed monthly amount base font from `text-3xl` to `text-2xl sm:text-3xl` for better mobile fit
+  6. Added `shrink-0` to detail row labels and `min-w-0` to value spans
+  7. Added `min-w-0 calc-card` to Card elements in the grid
+
+Stage Summary:
+- Calculator cards now properly constrain content width within grid columns
+- Large numbers break/wrap at any character instead of expanding cards
+- Mobile font size starts at text-2xl instead of text-3xl
+- Both usages of CalculatorSection (main page and proyek page) benefit from the fix

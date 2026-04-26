@@ -2164,9 +2164,17 @@ function CalculatorSection() {
         )}
 
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto items-start">
+        <style>{`
+          #simulasi .calc-card {
+            overflow: hidden;
+          }
+          #simulasi .calc-card .num-val {
+            overflow-wrap: anywhere;
+          }
+        `}</style>
           <FadeIn direction="left">
-            <Card className="border-0 shadow-xl min-w-0">
-              <CardContent className="p-5 md:p-8 space-y-6">
+            <Card className="border-0 shadow-xl min-w-0 calc-card">
+              <CardContent className="p-5 md:p-8 space-y-6 overflow-hidden">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 mb-2 block">
                     Pilih Properti
@@ -2274,13 +2282,13 @@ function CalculatorSection() {
           </FadeIn>
 
           <FadeIn direction="right">
-            <Card className="border-0 shadow-xl text-white bg-gradient-to-br from-red-600 to-red-700 min-w-0">
-              <CardContent className="p-5 md:p-8">
+            <Card className="border-0 shadow-xl text-white bg-gradient-to-br from-red-600 to-red-700 min-w-0 calc-card">
+              <CardContent className="p-5 md:p-8 overflow-hidden">
                 <div className="text-center mb-8">
                   <p className="text-red-200 text-sm uppercase tracking-wider mb-2">
                     Cicilan Bulanan
                   </p>
-                  <p className="text-3xl md:text-4xl lg:text-5xl font-extrabold">
+                  <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold num-val">
                     Rp {formatRp(monthly * 1_000_000)}
                   </p>
                   <p className="text-red-200 text-sm mt-2">
@@ -2301,8 +2309,8 @@ function CalculatorSection() {
                     { label: `Tenor (${tenor} tahun)`, value: `${tenorNum * 12} bulan` },
                   ].map((row) => (
                     <div key={row.label} className="flex justify-between items-center gap-2 min-w-0">
-                      <span className="text-red-200 text-sm">{row.label}</span>
-                      <span className="font-bold text-sm md:text-base text-right">{row.value}</span>
+                      <span className="text-red-200 text-sm shrink-0">{row.label}</span>
+                      <span className="font-bold text-sm md:text-base text-right num-val min-w-0">{row.value}</span>
                     </div>
                   ))}
                 </div>
