@@ -2160,7 +2160,7 @@ function CalculatorSection() {
         </FadeIn>
         )}
 
-        <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto items-start">
           <FadeIn direction="left">
             <Card className="border-0 shadow-xl min-w-0">
               <CardContent className="p-5 md:p-8 space-y-5 md:space-y-6">
