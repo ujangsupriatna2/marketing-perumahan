@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Plus, Pencil, Trash2, MessageSquare, Loader2, Star, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -51,10 +52,13 @@ interface Testimonial {
   text: string;
   rating: number;
   featured: boolean;
+  mitraId: string | null;
   createdAt: string;
 }
 
-const emptyForm = { name: "", role: "", text: "", rating: "5", featured: false };
+interface MitraOption { id: string; name: string; }
+
+const emptyForm = { name: "", role: "", text: "", rating: "5", featured: false, mitraId: "" };
 
 function StarDisplay({ rating }: { rating: number }) {
   return (
@@ -70,6 +74,8 @@ function StarDisplay({ rating }: { rating: number }) {
 }
 
 export default function TestimoniPage() {
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "superadmin";
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
@@ -80,6 +86,18 @@ export default function TestimoniPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mitraList, setMitraList] = useState<MitraOption[]>([]);
+
+  const fetchMitraList = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/mitra?limit=100");
+      if (res.ok) {
+        const data = await res.json();
+        const raw = data.mitra ?? data;
+        setMitraList(Array.isArray(raw) ? raw.map((m: { id: string; name: string }) => ({ id: m.id, name: m.name })) : []);
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const fetchTestimonials = useCallback(async () => {
     try {
@@ -91,17 +109,18 @@ export default function TestimoniPage() {
   }, []);
 
   useEffect(() => { fetchTestimonials(); }, [fetchTestimonials]);
+  useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
 
   const openCreate = () => {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, mitraId: (session?.user as { mitraId?: string })?.mitraId || "" });
     setErrors({});
     setFormOpen(true);
   };
 
   const openEdit = (t: Testimonial) => {
     setEditing(t);
-    setForm({ name: t.name, role: t.role, text: t.text, rating: String(t.rating), featured: t.featured });
+    setForm({ name: t.name, role: t.role, text: t.text, rating: String(t.rating), featured: t.featured, mitraId: t.mitraId || "" });
     setErrors({});
     setFormOpen(true);
   };
@@ -133,7 +152,7 @@ export default function TestimoniPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, mitraId: form.mitraId || null }),
       });
       if (!res.ok) { toast.error("Gagal menyimpan"); return; }
       toast.success(editing ? "Testimoni berhasil diupdate" : "Testimoni berhasil ditambahkan");
@@ -239,6 +258,21 @@ export default function TestimoniPage() {
             <DialogTitle>{editing ? "Edit Testimoni" : "Tambah Testimoni Baru"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
+            {isSuperAdmin && (
+              <div className="space-y-2">
+                <Label>Mitra Perumahan</Label>
+                <Select value={form.mitraId || "none"} onValueChange={(v) => setForm({ ...form, mitraId: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="Pilih mitra..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa Mitra</SelectItem>
+                    {mitraList.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-gray-400">Assign testimoni ke mitra tertentu.</p>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>

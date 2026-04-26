@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import {
   Plus,
   Pencil,
@@ -83,8 +84,11 @@ interface Property {
   kprTenorOptions: string;
   kprInstallments: string;
   isFeatured: boolean;
+  mitraId: string | null;
   createdAt: string;
 }
+
+interface MitraOption { id: string; name: string; }
 
 const STATUS_MAP: Record<string, { label: string; className: string }> = {
   available: { label: "Tersedia", className: "bg-green-100 text-green-700" },
@@ -107,6 +111,7 @@ interface FormState {
   dpOptions: string; tenorOptions: string;
   syariahMargin: string;
   kprDpOptions: string; kprTenorOptions: string; kprInstallments: string;
+  mitraId: string;
 }
 
 const emptyForm: FormState = {
@@ -118,6 +123,7 @@ const emptyForm: FormState = {
   dpOptions: "30,35,40,45,50", tenorOptions: "1,2,3,4,5",
   syariahMargin: "15",
   kprDpOptions: "0,10,15,20,25,30", kprTenorOptions: "5,10,15,20,25", kprInstallments: "{}",
+  mitraId: "",
 };
 
 // ──── Helpers ────
@@ -513,6 +519,8 @@ function TagInput({
 
 // ──── Main Page ────
 export default function ProyekPage() {
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "superadmin";
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -524,6 +532,18 @@ export default function ProyekPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mitraList, setMitraList] = useState<MitraOption[]>([]);
+
+  const fetchMitraList = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/mitra?limit=100");
+      if (res.ok) {
+        const data = await res.json();
+        const raw = data.mitra ?? data;
+        setMitraList(Array.isArray(raw) ? raw.map((m: { id: string; name: string }) => ({ id: m.id, name: m.name })) : []);
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const fetchProperties = useCallback(async () => {
     try {
@@ -536,10 +556,11 @@ export default function ProyekPage() {
   }, [search]);
 
   useEffect(() => { fetchProperties(); }, [fetchProperties]);
+  useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
 
   const openCreate = () => {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, mitraId: (session?.user as { mitraId?: string })?.mitraId || "" });
     setErrors({});
     setFormOpen(true);
   };
@@ -562,6 +583,7 @@ export default function ProyekPage() {
       kprDpOptions: parseJSONToCSV(p.kprDpOptions, "0,10,15,20,25,30"),
       kprTenorOptions: parseJSONToCSV(p.kprTenorOptions, "5,10,15,20,25"),
       kprInstallments: p.kprInstallments || "{}",
+      mitraId: p.mitraId || "",
     });
     setErrors({});
     setFormOpen(true);
@@ -623,6 +645,7 @@ export default function ProyekPage() {
           ...form,
           slug,
           images,
+          mitraId: form.mitraId || null,
           dpOptions: csvToJSON(form.dpOptions),
           tenorOptions: csvToJSON(form.tenorOptions),
           kprDpOptions: csvToJSON(form.kprDpOptions),
@@ -768,6 +791,22 @@ export default function ProyekPage() {
             <DialogTitle>{editing ? "Edit Proyek" : "Tambah Proyek Baru"}</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+            {/* ── Mitra (Super Admin only) ── */}
+            {isSuperAdmin && (
+              <div className="sm:col-span-2 space-y-2">
+                <Label>Mitra Perumahan</Label>
+                <Select value={form.mitraId || "none"} onValueChange={(v) => setForm({ ...form, mitraId: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="Pilih mitra..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa Mitra</SelectItem>
+                    {mitraList.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-gray-400">Assign proyek ke mitra tertentu. Biarkan kosong untuk tanpa mitra.</p>
+              </div>
+            )}
             {/* ── Info Dasar ── */}
             <div className="space-y-2">
               <Label className="flex items-center gap-0.5">Nama Proyek <span className="text-red-500">*</span></Label>

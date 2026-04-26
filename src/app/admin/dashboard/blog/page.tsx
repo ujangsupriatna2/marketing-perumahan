@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Plus, Pencil, Trash2, Search, FileText, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
 import ImageUpload from "@/components/admin/image-upload";
 import RichEditor from "@/components/admin/rich-editor";
@@ -57,12 +58,15 @@ interface BlogPost {
   image: string;
   published: boolean;
   readTime: string;
+  mitraId: string | null;
   createdAt: string;
 }
 
+interface MitraOption { id: string; name: string; }
+
 const emptyForm = {
   title: "", slug: "", excerpt: "", content: "", category: "",
-  author: `Admin`, image: "", published: false, readTime: "5 menit",
+  author: `Admin`, image: "", published: false, readTime: "5 menit", mitraId: "",
 };
 
 function generateSlug(title: string): string {
@@ -70,6 +74,8 @@ function generateSlug(title: string): string {
 }
 
 export default function BlogPage() {
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "superadmin";
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -80,6 +86,18 @@ export default function BlogPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mitraList, setMitraList] = useState<MitraOption[]>([]);
+
+  const fetchMitraList = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/mitra?limit=100");
+      if (res.ok) {
+        const data = await res.json();
+        const raw = data.mitra ?? data;
+        setMitraList(Array.isArray(raw) ? raw.map((m: { id: string; name: string }) => ({ id: m.id, name: m.name })) : []);
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const fetchBlogs = useCallback(async () => {
     try {
@@ -92,10 +110,11 @@ export default function BlogPage() {
   }, [search]);
 
   useEffect(() => { fetchBlogs(); }, [fetchBlogs]);
+  useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
 
   const openCreate = () => {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, mitraId: (session?.user as { mitraId?: string })?.mitraId || "" });
     setErrors({});
     setFormOpen(true);
   };
@@ -106,6 +125,7 @@ export default function BlogPage() {
       title: b.title, slug: b.slug, excerpt: b.excerpt, content: b.content,
       category: b.category, author: b.author, image: b.image,
       published: b.published, readTime: b.readTime,
+      mitraId: b.mitraId || "",
     });
     setErrors({});
     setFormOpen(true);
@@ -143,7 +163,7 @@ export default function BlogPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, slug }),
+        body: JSON.stringify({ ...form, slug, mitraId: form.mitraId || null }),
       });
       if (!res.ok) { const err = await res.json(); toast.error(err.error || "Gagal menyimpan"); return; }
       toast.success(editing ? "Blog berhasil diupdate" : "Blog berhasil ditambahkan");
@@ -261,6 +281,21 @@ export default function BlogPage() {
             <DialogTitle>{editing ? "Edit Artikel" : "Tambah Artikel Baru"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
+            {isSuperAdmin && (
+              <div className="space-y-2">
+                <Label>Mitra Perumahan</Label>
+                <Select value={form.mitraId || "none"} onValueChange={(v) => setForm({ ...form, mitraId: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="Pilih mitra..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa Mitra</SelectItem>
+                    {mitraList.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-gray-400">Assign artikel ke mitra tertentu.</p>
+              </div>
+            )}
             <div className="space-y-2">
               <Label>
                 Judul <span className="text-red-500">*</span>

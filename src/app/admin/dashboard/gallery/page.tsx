@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Plus, Pencil, Trash2, Search, Camera, Loader2, AlertCircle, Image as ImageIcon } from "lucide-react";
 import ImageUpload from "@/components/admin/image-upload";
 import { toast } from "sonner";
@@ -50,12 +51,17 @@ interface GalleryItem {
   image: string;
   description: string;
   sortOrder: number;
+  mitraId: string | null;
   createdAt: string;
 }
 
-const emptyForm = { title: "", category: "", image: "", description: "", sortOrder: "0" };
+interface MitraOption { id: string; name: string; }
+
+const emptyForm = { title: "", category: "", image: "", description: "", sortOrder: "0", mitraId: "" };
 
 export default function GalleryPage() {
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role === "superadmin";
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -66,6 +72,18 @@ export default function GalleryPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mitraList, setMitraList] = useState<MitraOption[]>([]);
+
+  const fetchMitraList = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/mitra?limit=100");
+      if (res.ok) {
+        const data = await res.json();
+        const raw = data.mitra ?? data;
+        setMitraList(Array.isArray(raw) ? raw.map((m: { id: string; name: string }) => ({ id: m.id, name: m.name })) : []);
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const fetchGallery = useCallback(async () => {
     try {
@@ -84,10 +102,11 @@ export default function GalleryPage() {
   }, [search]);
 
   useEffect(() => { fetchGallery(); }, [fetchGallery]);
+  useEffect(() => { if (isSuperAdmin) fetchMitraList(); }, [isSuperAdmin, fetchMitraList]);
 
   const openCreate = () => {
     setEditing(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, mitraId: (session?.user as { mitraId?: string })?.mitraId || "" });
     setErrors({});
     setFormOpen(true);
   };
@@ -97,6 +116,7 @@ export default function GalleryPage() {
     setForm({
       title: g.title, category: g.category, image: g.image,
       description: g.description, sortOrder: String(g.sortOrder),
+      mitraId: g.mitraId || "",
     });
     setErrors({});
     setFormOpen(true);
@@ -134,7 +154,7 @@ export default function GalleryPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, mitraId: form.mitraId || null }),
       });
       if (!res.ok) { toast.error("Gagal menyimpan"); return; }
       toast.success(editing ? "Gallery berhasil diupdate" : "Gallery berhasil ditambahkan");
@@ -264,6 +284,21 @@ export default function GalleryPage() {
             <DialogTitle>{editing ? "Edit Gallery" : "Tambah Foto Baru"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
+            {isSuperAdmin && (
+              <div className="space-y-2">
+                <Label>Mitra Perumahan</Label>
+                <Select value={form.mitraId || "none"} onValueChange={(v) => setForm({ ...form, mitraId: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="Pilih mitra..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa Mitra</SelectItem>
+                    {mitraList.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-gray-400">Assign foto ke mitra tertentu.</p>
+              </div>
+            )}
             <div className="space-y-2">
               <Label>
                 Judul <span className="text-red-500">*</span>
