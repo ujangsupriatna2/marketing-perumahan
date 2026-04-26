@@ -85,7 +85,8 @@ export default function UsersPage() {
       const res = await fetch("/api/admin/mitra?limit=100");
       if (res.ok) {
         const data = await res.json();
-        setMitraList(Array.isArray(data) ? data.map((m: {id: string; name: string}) => ({ id: m.id, name: m.name })) : []);
+        const raw = data.mitra ?? data;
+        setMitraList(Array.isArray(raw) ? raw.map((m: {id: string; name: string}) => ({ id: m.id, name: m.name })) : []);
       }
     } catch {
       // silently ignore mitra fetch errors
