@@ -40,10 +40,10 @@ export async function GET(req: Request) {
 
       return {
         id: b.id,
-        title: b.title,
+        title: b.title?.replace(/&nbsp;/g, " "),
         slug: b.slug,
-        excerpt: b.excerpt,
-        content: b.content,
+        excerpt: b.excerpt?.replace(/&nbsp;/g, " "),
+        content: b.content?.replace(/&nbsp;/g, " "),
         category: b.category,
         author: b.author,
         images,

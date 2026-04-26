@@ -3,6 +3,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 
+/** Clean Quill HTML: replace &nbsp; with normal spaces so text wraps properly */
+function cleanHtml(html: string): string {
+  return html
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s{2,}/g, (match) => match.slice(0, 1) === " " ? " " : match);
+}
+
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -62,10 +69,10 @@ export async function POST(req: Request) {
 
     const blog = await db.blogPost.create({
       data: {
-        title,
+        title: cleanHtml(title),
         slug,
-        excerpt: excerpt || "",
-        content: content || "",
+        excerpt: cleanHtml(excerpt || ""),
+        content: cleanHtml(content || ""),
         category: category || "",
         author: author || "Admin",
         image: image || "",

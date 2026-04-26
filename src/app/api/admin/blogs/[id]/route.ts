@@ -3,6 +3,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 
+/** Clean Quill HTML: replace &nbsp; with normal spaces so text wraps properly */
+function cleanHtml(html: string): string {
+  return html
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s{2,}/g, (match) => match.slice(0, 1) === " " ? " " : match);
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -54,7 +61,14 @@ export async function PUT(
     const updateData: Record<string, unknown> = {};
     const fields = ["title", "slug", "excerpt", "content", "category", "author", "image", "readTime"];
     for (const f of fields) {
-      if (body[f] !== undefined) updateData[f] = body[f];
+      if (body[f] !== undefined) {
+        // Clean HTML fields to replace &nbsp; with normal spaces
+        if (f === "title" || f === "excerpt" || f === "content") {
+          updateData[f] = cleanHtml(body[f]);
+        } else {
+          updateData[f] = body[f];
+        }
+      }
     }
     if (body.published !== undefined) updateData.published = !!body.published;
 

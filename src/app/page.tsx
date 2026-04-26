@@ -3251,7 +3251,7 @@ function BlogArticlePage({ slug }: { slug: string }) {
           <div
             className="prose prose-sm md:prose-base max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-red-600 prose-img:rounded-xl prose-blockquote:border-l-red-500 prose-blockquote:text-gray-500 prose-blockquote:italic prose-li:text-gray-700
             [&>*]:!max-w-full [&_*]:!max-w-full [&_img]:max-w-full [&_img]:h-auto [&_video]:max-w-full [&_iframe]:max-w-full [&_table]:table-fixed [&_td]:break-words [&_th]:break-words [&_p]:break-words [&_p]:overflow-wrap-anywhere [&_span]:!inline [&_span]:break-words [&_br]:block"
-            dangerouslySetInnerHTML={{ __html: article.content || "<p class='text-gray-400'>Konten belum tersedia.</p>" }}
+            dangerouslySetInnerHTML={{ __html: (article.content || "<p class='text-gray-400'>Konten belum tersedia.</p>").replace(/&nbsp;/g, " ") }}
           />
 
           {/* Footer CTA */}
