@@ -23,7 +23,6 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
   loading: false,
   initialized: false,
   fetchGalleryItems: async () => {
-    if (get().initialized) return;
     set({ loading: true });
     try {
       const res = await fetch("/api/gallery?limit=100");

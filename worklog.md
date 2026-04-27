@@ -289,3 +289,79 @@ Stage Summary:
 - 2398 insertions, 3701 deletions (net -1303 lines)
 - Banner images from settings now correctly rendered: S.hero_bg_image (Beranda) and S.tentangkami_image (Tentang)
 - Dev server compiles and serves page successfully (HTTP 200)
+
+---
+Task ID: 2
+Agent: Main
+Task: Significantly enhance Home page with gallery, blog detail dialog, loading states, and more
+
+Work Log:
+- Read and analyzed entire home-client.tsx (~2487 lines) and all 4 Zustand stores
+- Fixed Store Guards (CRITICAL): Removed `if (get().initialized) return;` from:
+  - src/lib/property-store.ts (fetchProperties)
+  - src/lib/blog-store.ts (fetchArticles)
+  - src/lib/gallery-store.ts (fetchGalleryItems)
+  - src/lib/testimonial-store.ts (fetchTestimonials)
+  This prevents stale data issues when navigating between views
+
+- Added Gallery Section to BerandaView:
+  - New section between Testimonials and CTA Banner
+  - Shows up to 8 gallery items in a responsive 2/3/4 column grid
+  - Hover overlay with title and category display
+  - "Lihat Semua Galeri" button opens full gallery dialog
+  - Individual image click opens Gallery Detail Dialog with full-size image, title, description
+
+- Added Full Gallery Dialog:
+  - Shows all gallery items in a 2/3-column grid within a Dialog
+  - Each item is clickable to open the detail dialog
+  - Smooth transition between full gallery and detail views
+
+- Added Blog Article Detail Dialog:
+  - In BlogView, added selectedArticle state
+  - Featured article card and grid cards are now clickable
+  - Dialog shows: hero image, category badge, title, author, date, read time, views
+  - Full article content rendered with dangerouslySetInnerHTML using prose styling
+  - "Tutup Artikel" close button at bottom
+
+- Enhanced Hero Section:
+  - Changed hardcoded "Hunian Premium di Bandung" to dynamic `Hunian Premium dari {S.company_name}`
+  - Uses template literal with company name from settings store
+
+- Added Loading States in BerandaView:
+  - Skeleton shimmer placeholders for Featured Properties (3 cards) while propertiesLoading
+  - Skeleton shimmer placeholders for Blog Preview (3 cards) while articlesLoading
+  - Skeleton shimmer placeholders for Testimonials (3 cards) while testimonialsLoading
+  - Uses existing skeleton-shimmer CSS class
+
+- Enhanced Kontak View:
+  - Added Contact Person info card showing S.contact_person
+  - Uses User icon from lucide-react
+  - Conditionally rendered (only shows if contact_person exists)
+  - Adjusted social media section delay to 0.35 to avoid overlap
+
+- Added fetchGalleryItems to PageContent useEffect:
+  - Added `const { fetchGalleryItems } = useGalleryStore();` destructuring
+  - Added `fetchGalleryItems()` call in the useEffect
+  - Added fetchGalleryItems to useEffect dependency array
+
+- Fixed pre-existing bug in TentangView:
+  - Removed invalid `testimonials` destructuring from usePropertyStore (PropertyStore doesn't have testimonials)
+  - tList from useTestimonialStore was already being used correctly
+
+- Added new icon imports:
+  - `User` for contact person card and blog article detail meta
+  - `Image as ImageIcon` for gallery section badge
+  - `CalendarDays` for blog article date display
+
+- Verified: ESLint passes with only pre-existing prisma/seed.js errors
+- Pre-existing framer-motion TS2322 type warnings are unchanged (don't prevent compilation)
+
+Stage Summary:
+- 6 files changed: home-client.tsx, property-store.ts, blog-store.ts, gallery-store.ts, testimonial-store.ts, worklog.md
+- Gallery section with detail dialog and full gallery dialog added to BerandaView
+- Blog article detail dialog with HTML content rendering added to BlogView
+- Skeleton loading states for properties, articles, and testimonials in BerandaView
+- Hero section tagline now dynamic with company name
+- Contact Person card added to KontakView
+- All store initialized guards removed for reliable data fetching
+- Gallery items now fetched on page load via PageContent useEffect

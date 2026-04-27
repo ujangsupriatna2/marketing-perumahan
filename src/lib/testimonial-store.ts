@@ -24,7 +24,6 @@ export const useTestimonialStore = create<TestimonialStore>((set, get) => ({
   loading: false,
   initialized: false,
   fetchTestimonials: async () => {
-    if (get().initialized) return;
     set({ loading: true });
     try {
       const res = await fetch("/api/testimonials?limit=50");

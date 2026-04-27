@@ -83,6 +83,9 @@ import {
   CircleDot,
   ChevronDown,
   ExternalLink,
+  User,
+  Image as ImageIcon,
+  CalendarDays,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -566,12 +569,17 @@ function PageHeader({
 
 function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
   const S = useSettingsStore((s) => s.settings);
-  const { properties } = usePropertyStore();
-  const { articles } = useBlogStore();
-  const { testimonials } = useTestimonialStore();
+  const { properties, loading: propertiesLoading } = usePropertyStore();
+  const { articles, loading: articlesLoading } = useBlogStore();
+  const { testimonials, loading: testimonialsLoading } = useTestimonialStore();
+  const { galleryItems } = useGalleryStore();
+
+  const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
+  const [showAllGallery, setShowAllGallery] = useState(false);
 
   const featuredProperties = properties.filter((p) => p.isFeatured);
   const latestArticles = articles.slice(0, 3);
+  const galleryPreview = galleryItems.slice(0, 8);
   const totalUnits = parseInt(S.total_units_sold) || 500;
 
   return (
@@ -650,7 +658,7 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
             >
               <Sparkles className="w-4 h-4 text-indigo-400" />
               <span className="text-sm text-indigo-300 font-medium">
-                Hunian Premium di Bandung
+                {`Hunian Premium dari ${S.company_name}`}
               </span>
             </motion.div>
 
@@ -846,7 +854,21 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
       </section>
 
       {/* ─── Featured Properties ─── */}
-      {featuredProperties.length > 0 && (
+      {propertiesLoading ? (
+        <section className="py-16 sm:py-20 bg-silver-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <div className="skeleton-shimmer h-8 w-48 mx-auto mb-3 rounded-lg" />
+              <div className="skeleton-shimmer h-10 w-64 mx-auto rounded-lg" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton-shimmer rounded-2xl h-80" />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : featuredProperties.length > 0 && (
         <section className="py-16 sm:py-20 bg-silver-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
@@ -947,7 +969,21 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
       )}
 
       {/* ─── Blog Preview ─── */}
-      {latestArticles.length > 0 && (
+      {articlesLoading ? (
+        <section className="py-16 sm:py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <div className="skeleton-shimmer h-8 w-40 mx-auto mb-3 rounded-lg" />
+              <div className="skeleton-shimmer h-10 w-48 mx-auto rounded-lg" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton-shimmer rounded-2xl h-72" />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : latestArticles.length > 0 && (
         <section className="py-16 sm:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
@@ -1019,7 +1055,22 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
       )}
 
       {/* ─── Testimonials ─── */}
-      {testimonials.length > 0 && (
+      {testimonialsLoading ? (
+        <section className="py-16 sm:py-20 bg-silver-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="skeleton-shimmer h-8 w-40 mx-auto mb-3 rounded-lg" />
+              <div className="skeleton-shimmer h-10 w-52 mx-auto mb-3 rounded-lg" />
+              <div className="skeleton-shimmer h-4 w-80 mx-auto rounded-lg" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton-shimmer rounded-2xl h-56" />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : testimonials.length > 0 && (
         <section className="py-16 sm:py-20 bg-silver-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
@@ -1083,6 +1134,64 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
         </section>
       )}
 
+      {/* ─── Gallery ─── */}
+      {galleryPreview.length > 0 && (
+        <section className="py-16 sm:py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <FadeIn>
+              <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
+                <div>
+                  <Badge
+                    variant="secondary"
+                    className="bg-indigo-50 text-indigo-600 mb-3"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5 mr-1" />
+                    Galeri
+                  </Badge>
+                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                    Momen <span className="text-gradient-accent">Terbaik</span>
+                  </h2>
+                </div>
+                <Button
+                  variant="outline"
+                  className="border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+                  onClick={() => setShowAllGallery(true)}
+                >
+                  Lihat Semua Galeri
+                  <ArrowRight className="w-4 h-4 ml-1.5" />
+                </Button>
+              </div>
+            </FadeIn>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {galleryPreview.map((item, i) => (
+                <FadeIn key={item.id} delay={i * 0.06}>
+                  <button
+                    onClick={() => setSelectedGalleryItem(item)}
+                    className="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer block w-full"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <p className="text-white text-sm font-semibold line-clamp-1">
+                        {item.title}
+                      </p>
+                      {item.category && (
+                        <p className="text-white/70 text-xs mt-0.5">{item.category}</p>
+                      )}
+                    </div>
+                  </button>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── CTA Banner ─── */}
       <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1127,6 +1236,86 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
           </FadeIn>
         </div>
       </section>
+
+      {/* ─── Gallery Detail Dialog ─── */}
+      <Dialog
+        open={!!selectedGalleryItem}
+        onOpenChange={() => setSelectedGalleryItem(null)}
+      >
+        <DialogContent className="max-w-3xl p-0 overflow-hidden">
+          {selectedGalleryItem && (
+            <>
+              <div className="relative max-h-[60vh] overflow-hidden">
+                <img
+                  src={selectedGalleryItem.image}
+                  alt={selectedGalleryItem.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  {selectedGalleryItem.category && (
+                    <Badge className="gradient-accent text-white text-xs border-0 mb-2">
+                      {selectedGalleryItem.category}
+                    </Badge>
+                  )}
+                  <h3 className="text-xl font-bold text-white">
+                    {selectedGalleryItem.title}
+                  </h3>
+                </div>
+              </div>
+              <div className="p-5">
+                <DialogHeader className="sr-only">
+                  <DialogTitle>{selectedGalleryItem.title}</DialogTitle>
+                  <DialogDescription>Galeri {selectedGalleryItem.title}</DialogDescription>
+                </DialogHeader>
+                {selectedGalleryItem.description && (
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {selectedGalleryItem.description}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Full Gallery Dialog ─── */}
+      <Dialog open={showAllGallery} onOpenChange={setShowAllGallery}>
+        <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto p-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-gray-900">
+              Galeri <span className="text-gradient-accent">Kami</span>
+            </DialogTitle>
+            <DialogDescription>
+              Kumpulan momen terbaik dari proyek dan kegiatan kami.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+            {galleryItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setShowAllGallery(false);
+                  setTimeout(() => setSelectedGalleryItem(item), 200);
+                }}
+                className="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer block w-full"
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-1 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <p className="text-white text-xs font-semibold line-clamp-1">
+                    {item.title}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
@@ -1137,7 +1326,7 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
 
 function TentangView({ navigate }: { navigate: (v: ViewName) => void }) {
   const S = useSettingsStore((s) => s.settings);
-  const { properties, testimonials } = usePropertyStore();
+  const { properties } = usePropertyStore();
   const { testimonials: tList } = useTestimonialStore();
 
   const totalUnits = parseInt(S.total_units_sold) || 500;
@@ -1801,6 +1990,7 @@ function BlogView({ navigate }: { navigate: (v: ViewName) => void }) {
   const S = useSettingsStore((s) => s.settings);
   const { articles, loading } = useBlogStore();
   const [page, setPage] = useState(1);
+  const [selectedArticle, setSelectedArticle] = useState<BlogArticle | null>(null);
   const perPage = 6;
 
   const totalPages = Math.ceil(articles.length / perPage);
@@ -1851,7 +2041,7 @@ function BlogView({ navigate }: { navigate: (v: ViewName) => void }) {
                   {/* Featured Article */}
                   {featured && (
                     <FadeIn>
-                      <Card className="card-lift border-silver-200/60 bg-white overflow-hidden group cursor-pointer">
+                      <Card className="card-lift border-silver-200/60 bg-white overflow-hidden group cursor-pointer" onClick={() => setSelectedArticle(featured)}>
                         <div className="grid grid-cols-1 sm:grid-cols-2">
                           <div className="relative h-56 sm:h-full overflow-hidden">
                             <img
@@ -1899,7 +2089,7 @@ function BlogView({ navigate }: { navigate: (v: ViewName) => void }) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {remaining.map((article, i) => (
                       <FadeIn key={article.id} delay={i * 0.06}>
-                        <Card className="card-lift border-silver-200/60 bg-white overflow-hidden h-full group cursor-pointer">
+                        <Card className="card-lift border-silver-200/60 bg-white overflow-hidden h-full group cursor-pointer" onClick={() => setSelectedArticle(article)}>
                           <div className="relative h-44 overflow-hidden">
                             <img
                               src={article.images?.[0] || "/images/placeholder-blog.jpg"}
@@ -2047,6 +2237,85 @@ function BlogView({ navigate }: { navigate: (v: ViewName) => void }) {
           </div>
         </div>
       </section>
+
+      {/* ─── Blog Article Detail Dialog ─── */}
+      <Dialog
+        open={!!selectedArticle}
+        onOpenChange={() => setSelectedArticle(null)}
+      >
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+          {selectedArticle && (
+            <>
+              {/* Hero image */}
+              <div className="relative h-56 sm:h-72 overflow-hidden">
+                <img
+                  src={selectedArticle.images?.[0] || "/images/placeholder-blog.jpg"}
+                  alt={selectedArticle.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4">
+                  <div>
+                    {selectedArticle.category && (
+                      <Badge className="gradient-accent text-white text-xs border-0 mb-2">
+                        {selectedArticle.category}
+                      </Badge>
+                    )}
+                    <h2 className="text-xl sm:text-2xl font-bold text-white line-clamp-2">
+                      {selectedArticle.title}
+                    </h2>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-8">
+                <DialogHeader className="sr-only">
+                  <DialogTitle>{selectedArticle.title}</DialogTitle>
+                  <DialogDescription>{selectedArticle.excerpt}</DialogDescription>
+                </DialogHeader>
+
+                {/* Meta info */}
+                <div className="flex flex-wrap items-center gap-4 text-xs text-gray-400 mb-6 pb-6 border-b border-silver-200/60">
+                  <span className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-indigo-400" />
+                    {selectedArticle.author}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CalendarDays className="w-3.5 h-3.5 text-indigo-400" />
+                    {selectedArticle.dateFormatted || selectedArticle.createdAt}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                    {selectedArticle.readTime}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5 text-indigo-400" />
+                    {selectedArticle.views} views
+                  </span>
+                </div>
+
+                {/* Full content */}
+                <div
+                  className="prose prose-sm sm:prose max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-indigo-600 prose-img:rounded-xl"
+                  dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
+                />
+
+                {/* Close button */}
+                <div className="mt-8 pt-6 border-t border-silver-200/60">
+                  <Button
+                    variant="outline"
+                    className="border-silver-200 text-gray-600 hover:bg-silver-50"
+                    onClick={() => setSelectedArticle(null)}
+                  >
+                    <X className="w-4 h-4 mr-1.5" />
+                    Tutup Artikel
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
@@ -2248,9 +2517,28 @@ function KontakView({ navigate }: { navigate: (v: ViewName) => void }) {
                 </Card>
               </FadeIn>
 
+              {/* Contact Person */}
+              {S.contact_person && (
+                <FadeIn delay={0.3}>
+                  <Card className="card-lift border-silver-200/60 bg-white">
+                    <CardContent className="p-5 flex items-start gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                        <User className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 text-sm mb-0.5">
+                          Contact Person
+                        </p>
+                        <p className="text-sm text-gray-500">{S.contact_person}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </FadeIn>
+              )}
+
               {/* Social Media */}
               {(S.social_instagram || S.social_facebook || S.social_youtube || S.social_tiktok) && (
-                <FadeIn delay={0.3}>
+                <FadeIn delay={0.35}>
                   <Card className="border-silver-200/60 bg-white">
                     <CardContent className="p-5">
                       <h4 className="font-semibold text-gray-900 text-sm mb-4">
@@ -2419,6 +2707,7 @@ function PageContent() {
   const { fetchProperties } = usePropertyStore();
   const { fetchArticles } = useBlogStore();
   const { fetchTestimonials } = useTestimonialStore();
+  const { fetchGalleryItems } = useGalleryStore();
 
   const navigate = useCallback(
     (view: ViewName) => {
@@ -2433,7 +2722,8 @@ function PageContent() {
     fetchProperties();
     fetchArticles();
     fetchTestimonials();
-  }, [fetchSettings, fetchProperties, fetchArticles, fetchTestimonials]);
+    fetchGalleryItems();
+  }, [fetchSettings, fetchProperties, fetchArticles, fetchTestimonials, fetchGalleryItems]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
