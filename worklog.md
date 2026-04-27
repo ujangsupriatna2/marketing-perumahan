@@ -113,3 +113,52 @@ Stage Summary:
 - 9 articles per page with server-side pagination via API
 - API supports `sort=popular` parameter for sidebar popular posts
 - All changes committed and pushed to GitHub
+
+---
+Task ID: 5
+Agent: Main
+Task: Complete rewrite of marketing-perumahan landing page with silver elegant theme and multi-view navigation
+
+Work Log:
+- Analyzed existing project structure, types, API endpoints, and settings store
+- Rewrote `/src/app/globals.css` with complete silver/indigo theme:
+  - Replaced all cream/gold CSS variables with silver (#F8F9FA, #EEF0F2, #DDE1E6) and indigo (#6366F1) colors
+  - Updated scrollbar to slate (#94A3B8) with indigo hover
+  - Renamed .text-gradient-gold to .text-gradient-accent (indigo-violet gradient)
+  - Added new animation keyframes: float-slow, float-reverse, orbit, pulse-glow, gradient-shift, mesh-move, typewriter, scale-in, slide-in-right
+  - Added glassmorphism utility classes: .glass, .glass-dark, .glass-nav, .glass-card
+  - Added hero mesh background classes (.hero-mesh, .hero-orb)
+  - Added skeleton shimmer (.skeleton-shimmer) with pseudo-element shimmer animation
+  - Added gradient utilities: .gradient-accent, .gradient-dark-hero, .gradient-footer
+  - Added .btn-glow for indigo CTA shadow effect
+  - Added .card-lift for hover elevation animation
+
+- Rewrote `/src/app/page.tsx` (~1800 lines) with complete multi-view architecture:
+  - Navigation: All 5 nav links use query params (?beranda, ?tentang, ?mitra, ?blog, ?kontak)
+  - AnimatePresence page transitions between views with mode="wait"
+  - Shared components (all inline): NavBar, Footer, PageHeader, AnimatedSection, MitraCard, BlogCard, CountUpStat
+  - useCountUp custom hook for animated counter stats
+  - BerandaView: Full hero with gradient mesh + floating orbs, count-up stats, trust badges marquee, services grid, featured mitra, blog preview, testimonials, gradient CTA banner
+  - TentangView: Company story with image, core values grid, vision/mission cards, team stats, CTA
+  - MitraView: Search filter, stats summary, mitra card grid, CTA to become partner
+  - BlogView: 2-column layout with featured article, blog grid, pagination, popular posts sidebar, CTA sidebar
+  - KontakView: Contact form with validation, info cards (phone/email/address/WhatsApp), social media, OpenStreetMap embed
+  - Footer: 4-column layout with brand, navigation, contact, CTA + social icons
+  - Chatbot component integration maintained
+  - useSettingsStore integration maintained for dynamic settings
+
+- Color mapping applied throughout:
+  #FAF7F2 → #F8F9FA, #F0EBE3 → #EEF0F2, #E8E0D4 → #DDE1E6, #F5F0E8 → #F1F3F5
+  #8B8178 → #6B7280, #4A4A4A → #374151, #2D2D2D → #111827
+  #B8860B → #6366F1, #D4A76A → #818CF8, #C9A96E → #94A3B8, #8B7355 → #4F46E5
+
+- Lint check: 0 errors from new code (pre-existing errors in prisma/seed.js and admin/pengaturan/page.tsx unrelated)
+- Dev server: Page compiles and serves successfully (200 status)
+
+Stage Summary:
+- Complete visual overhaul from cream/gold to silver/indigo-violet elegant gradient theme
+- Multi-view SPA with 5 full-page views using query param navigation
+- Extensive animations: framer-motion page transitions, scroll-triggered animations, staggered children, count-up stats, floating orbs, skeleton loading
+- Glassmorphism navbar with active state highlighting
+- All existing data fetching patterns and types preserved
+- Chatbot and settings store integration maintained
