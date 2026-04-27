@@ -133,7 +133,7 @@ function ImageUploadField({ fieldKey, label, value, onChange }: {
           type="button"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-red-400 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50"
+          className="w-full h-40 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors cursor-pointer disabled:opacity-50"
         >
           {uploading ? (
             <Loader2 className="w-8 h-8 animate-spin" />
@@ -236,7 +236,7 @@ export default function PengaturanPage() {
           <h1 className="text-2xl font-bold text-gray-900">Pengaturan</h1>
           <p className="text-sm text-gray-500 mt-1">Konfigurasi website {settings.company_name || "Admin"}</p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="bg-red-600 hover:bg-red-700 text-white gap-2">
+        <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Simpan Pengaturan
         </Button>
@@ -256,8 +256,8 @@ export default function PengaturanPage() {
             <Card key={group.group} className="border-0 shadow-sm">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
-                    <group.icon className="w-4 h-4 text-red-600" />
+                  <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                    <group.icon className="w-4 h-4 text-indigo-600" />
                   </div>
                   {group.title}
                 </CardTitle>

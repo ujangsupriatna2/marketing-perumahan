@@ -315,8 +315,8 @@ function KPRCalculator() {
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-              <Banknote className="w-4 h-4 text-red-600" />
+            <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <Banknote className="w-4 h-4 text-indigo-600" />
             </div>
             KPR Bank
           </CardTitle>
@@ -393,8 +393,8 @@ function KPRCalculator() {
           </div>
 
           {/* Rate type */}
-          <div className="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
-            <span className="text-xs font-medium text-red-700">Tipe Bunga:</span>
+          <div className="flex items-center gap-4 p-3 bg-indigo-50 rounded-lg">
+            <span className="text-xs font-medium text-indigo-700">Tipe Bunga:</span>
             <div className="flex gap-2">
               {(["flat", "annuity"] as const).map((t) => (
                 <button
@@ -402,8 +402,8 @@ function KPRCalculator() {
                   onClick={() => setRateType(t)}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                     rateType === t
-                      ? "bg-red-600 text-white shadow-sm"
-                      : "bg-white text-red-600 border border-red-200 hover:bg-red-100"
+                      ? "bg-indigo-600 text-white shadow-sm"
+                      : "bg-white text-indigo-600 border border-indigo-200 hover:bg-indigo-100"
                   }`}
                 >
                   {t === "flat" ? "Flat" : "Anuitas (Efektif)"}
@@ -411,8 +411,8 @@ function KPRCalculator() {
               ))}
             </div>
             <div className="flex items-start gap-1 ml-auto">
-              <Info className="w-3.5 h-3.5 text-red-400 mt-0.5 shrink-0" />
-              <p className="text-[11px] text-red-600 leading-relaxed">
+              <Info className="w-3.5 h-3.5 text-indigo-400 mt-0.5 shrink-0" />
+              <p className="text-[11px] text-indigo-600 leading-relaxed">
                 {rateType === "flat"
                   ? "Flat: cicilan tetap, bunga dihitung dari pinjaman awal"
                   : "Anuitas: cicilan tetap, bunga dihitung dari sisa pinjaman (lebih realistis)"}
@@ -434,7 +434,7 @@ function KPRCalculator() {
                 onClick={() => setRate(preset.rate)}
                 className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
                   rate === preset.rate
-                    ? "bg-red-600 text-white"
+                    ? "bg-indigo-600 text-white"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}
               >
@@ -446,11 +446,11 @@ function KPRCalculator() {
       </Card>
 
       {/* Result Card */}
-      <Card className="border-0 shadow-sm bg-gradient-to-br from-red-600 via-red-700 to-rose-800 text-white">
+      <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-900 text-white">
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-red-200 text-sm font-medium">Cicilan per Bulan</p>
+              <p className="text-indigo-200 text-sm font-medium">Cicilan per Bulan</p>
               <p className="text-3xl font-bold mt-1">
                 Rp {formatRupiah(result.monthly)}
               </p>
@@ -460,7 +460,7 @@ function KPRCalculator() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowDetail(true)}
-                className="text-red-200 hover:text-white hover:bg-red-500/30"
+                className="text-indigo-200 hover:text-white hover:bg-indigo-500/30"
                 title="Lihat Detail"
               >
                 <Eye className="w-4 h-4" />
@@ -469,7 +469,7 @@ function KPRCalculator() {
                 variant="ghost"
                 size="icon"
                 onClick={() => handlePrint(printHtml)}
-                className="text-red-200 hover:text-white hover:bg-red-500/30"
+                className="text-indigo-200 hover:text-white hover:bg-indigo-500/30"
                 title="Print"
               >
                 <Printer className="w-4 h-4" />
@@ -478,7 +478,7 @@ function KPRCalculator() {
                 variant="ghost"
                 size="icon"
                 onClick={copyResult}
-                className="text-red-200 hover:text-white hover:bg-red-500/30"
+                className="text-indigo-200 hover:text-white hover:bg-indigo-500/30"
                 title="Salin"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -487,7 +487,7 @@ function KPRCalculator() {
                 variant="ghost"
                 size="icon"
                 onClick={resetForm}
-                className="text-red-200 hover:text-white hover:bg-red-500/30"
+                className="text-indigo-200 hover:text-white hover:bg-indigo-500/30"
                 title="Reset"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -497,25 +497,25 @@ function KPRCalculator() {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
             <div className="bg-white/10 rounded-xl p-3">
-              <p className="text-red-200 text-[11px]">Harga Properti</p>
+              <p className="text-indigo-200 text-[11px]">Harga Properti</p>
               <p className="text-sm font-semibold mt-0.5">{formatJuta(result.propertyPrice)} jt</p>
             </div>
             <div className="bg-white/10 rounded-xl p-3">
-              <p className="text-red-200 text-[11px]">Uang Muka</p>
+              <p className="text-indigo-200 text-[11px]">Uang Muka</p>
               <p className="text-sm font-semibold mt-0.5">{result.dpPercent.toFixed(1)}% ({formatJuta(result.dpAmount)} jt)</p>
             </div>
             <div className="bg-white/10 rounded-xl p-3">
-              <p className="text-red-200 text-[11px]">Jumlah Pinjaman</p>
+              <p className="text-indigo-200 text-[11px]">Jumlah Pinjaman</p>
               <p className="text-sm font-semibold mt-0.5">{formatJuta(result.loanAmount)} jt</p>
             </div>
             <div className="bg-white/10 rounded-xl p-3">
-              <p className="text-red-200 text-[11px]">Total Bayar</p>
+              <p className="text-indigo-200 text-[11px]">Total Bayar</p>
               <p className="text-sm font-semibold mt-0.5">{formatJuta(result.totalPayment)} jt</p>
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-2 bg-red-500/20 rounded-lg px-3 py-2">
-            <TrendingUp className="w-4 h-4 text-red-300" />
+          <div className="mt-4 flex items-center gap-2 bg-indigo-500/20 rounded-lg px-3 py-2">
+            <TrendingUp className="w-4 h-4 text-indigo-300" />
             <p className="text-sm">
               Total bunga: <span className="font-bold">Rp {formatRupiah(result.totalInterest)}</span> ({formatJuta(result.totalInterest)} jt) selama {result.tenorYears} tahun
             </p>
@@ -577,7 +577,7 @@ function KPRCalculator() {
                     const totalPay = monthly * t * 12;
                     const interest = totalPay - loan;
                     return (
-                      <td key={t} className="px-4 py-2.5 text-center text-xs text-red-500">
+                      <td key={t} className="px-4 py-2.5 text-center text-xs text-indigo-600">
                         {formatJuta(interest)} jt
                       </td>
                     );
@@ -599,9 +599,9 @@ function KPRCalculator() {
             {/* Dialog Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-red-600" />
+                <FileText className="w-5 h-5 text-indigo-600" />
                 <h2 className="text-lg font-bold text-gray-900">Detail Simulasi KPR</h2>
-                <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded-full font-medium">{rateType === "flat" ? "Flat" : "Anuitas"}</span>
+                <span className="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full font-medium">{rateType === "flat" ? "Flat" : "Anuitas"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => handlePrint(printHtml)} className="gap-1.5">
@@ -616,10 +616,10 @@ function KPRCalculator() {
             {/* Dialog Content */}
             <div className="flex-1 overflow-y-auto p-6">
               {/* Highlight */}
-              <div className="text-center mb-6 p-6 bg-red-50 rounded-xl border border-red-100">
-                <p className="text-sm text-red-600 font-medium">Cicilan Per Bulan</p>
-                <p className="text-3xl font-extrabold text-red-700 mt-1">Rp {formatRupiah(result.monthly)}</p>
-                <p className="text-xs text-red-500 mt-1">{rateType === "flat" ? "Bunga Flat — tetap setiap bulan" : "Bunga Anuitas — tetap, porsi pokok meningkat"}</p>
+              <div className="text-center mb-6 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
+                <p className="text-sm text-indigo-600 font-medium">Cicilan Per Bulan</p>
+                <p className="text-3xl font-extrabold text-indigo-700 mt-1">Rp {formatRupiah(result.monthly)}</p>
+                <p className="text-xs text-indigo-500 mt-1">{rateType === "flat" ? "Bunga Flat — tetap setiap bulan" : "Bunga Anuitas — tetap, porsi pokok meningkat"}</p>
               </div>
 
               {/* Detail Table */}
@@ -652,13 +652,13 @@ function KPRCalculator() {
                       <td className="px-4 py-3 text-gray-700">Tenor</td>
                       <td className="px-4 py-3 text-right font-semibold">{result.tenorYears} Tahun <span className="text-gray-400 font-normal">({result.tenorYears * 12} Bulan)</span></td>
                     </tr>
-                    <tr className="border-t border-gray-100 bg-red-50">
-                      <td className="px-4 py-3 text-red-700 font-semibold">Total Pembayaran</td>
-                      <td className="px-4 py-3 text-right font-bold text-red-700">Rp {formatRupiah(result.totalPayment)}</td>
+                    <tr className="border-t border-gray-100 bg-indigo-50">
+                      <td className="px-4 py-3 text-indigo-700 font-semibold">Total Pembayaran</td>
+                      <td className="px-4 py-3 text-right font-bold text-indigo-700">Rp {formatRupiah(result.totalPayment)}</td>
                     </tr>
-                    <tr className="border-t border-gray-100 bg-red-50/50">
-                      <td className="px-4 py-3 text-red-600 font-medium">Total Bunga</td>
-                      <td className="px-4 py-3 text-right font-semibold text-red-600">Rp {formatRupiah(result.totalInterest)}</td>
+                    <tr className="border-t border-gray-100 bg-indigo-50/50">
+                      <td className="px-4 py-3 text-indigo-600 font-medium">Total Bunga</td>
+                      <td className="px-4 py-3 text-right font-semibold text-indigo-600">Rp {formatRupiah(result.totalInterest)}</td>
                     </tr>
                   </tbody>
                 </table>

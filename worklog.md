@@ -196,3 +196,46 @@ Stage Summary:
 - All 4 non-beranda views now receive and use the navigate prop for SPA routing
 - BlogView's "Kembali ke Beranda" buttons now use navigate instead of direct router.push
 - All navigation uses centralized navigate function via router.push for consistent SPA behavior
+
+---
+Task ID: 7
+Agent: Main
+Task: Update login page and admin dashboard colors from red to indigo theme
+
+Work Log:
+- Confirmed banner images in Beranda (hero_bg_image) and Tentang (page_banner_image, tentangkami_image) already use settings data via useSettingsStore — no hardcoded banners found
+- Updated login page (src/app/admin/login/page.tsx):
+  - Background gradient: from-red-50/amber-50 → from-indigo-50/slate-50
+  - Decorative blurs: bg-red-100 → bg-indigo-100, bg-amber-100 → bg-slate-100
+  - Back link hover: hover:text-red-600 → hover:text-indigo-600
+  - Lock icon gradient: from-red-600/red-700 → from-indigo-600/indigo-700
+  - Submit button gradient: from-red-600/red-700/red-800 → from-indigo-600/indigo-700/indigo-800
+- Updated admin dashboard layout (src/app/admin/dashboard/layout.tsx):
+  - Active nav: bg-red-600/shadow-red-600 → bg-indigo-600/shadow-indigo-600
+  - Logo fallback: from-red-600/amber-500 → from-indigo-600/indigo-400
+  - Home link hover: hover:text-red-600 → hover:text-indigo-600
+  - Avatar fallback: bg-red-600 → bg-indigo-600
+  - Super Admin badge: bg-red-100/text-red-700 → bg-indigo-100/text-indigo-700
+- Updated dashboard home (src/app/admin/dashboard/page.tsx):
+  - Total Products stat card: from-red-500/red-600 → from-indigo-500/indigo-600, bg-red-50 → bg-indigo-50
+- Updated pengaturan page (src/app/admin/dashboard/pengaturan/page.tsx):
+  - Save button: bg-red-600 → bg-indigo-600
+  - Group icons: bg-red-50/text-red-600 → bg-indigo-50/text-indigo-600
+  - Upload hover: hover:border-red-400/hover:text-red-500 → hover:border-indigo-400/hover:text-indigo-500
+- Updated kalkulator page (src/app/admin/dashboard/kalkulator/page.tsx) via subagent:
+  - 20+ red → indigo changes in KPR calculator UI (header icon, rate toggle, presets, result card gradient, dialog highlights, detail tables)
+  - Print CSS and PDF templates intentionally kept red (brand colors for printed output)
+  - Syariah calculator unchanged (already uses amber theme)
+- Updated all 7 CRUD pages (blog, mitra, proyek, bank, users, gallery, testimoni):
+  - Primary action buttons (Tambah Baru, Simpan): bg-red-600 → bg-indigo-600
+  - Superadmin badge in users page: bg-red-600 → bg-indigo-600
+  - Edit icon hovers: hover:text-blue-600 or hover:text-indigo-600 (both acceptable)
+- Semantic red preserved correctly:
+  - Delete buttons, validation errors, required field markers, status badges (Terjual), logout button all kept red
+  - Destructive action AlertDialogAction (Hapus) buttons kept red
+
+Stage Summary:
+- All admin pages now use consistent indigo (#6366F1) primary color matching the public landing page
+- Login page, dashboard layout, all CRUD pages, kalkulator, and pengaturan updated
+- Red color only used for semantic purposes: errors, delete actions, validation, danger states
+- 0 new lint errors from changes

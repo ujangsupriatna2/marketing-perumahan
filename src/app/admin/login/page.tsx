@@ -40,18 +40,18 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-amber-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-slate-50 p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-100 rounded-full opacity-50 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-amber-100 rounded-full opacity-50 blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-100 rounded-full opacity-50 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-100 rounded-full opacity-50 blur-3xl" />
       </div>
 
       <div className="w-full max-w-md relative">
         {/* Back to site */}
         <a
           href="/?tab=home"
-          className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-red-600 transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-indigo-600 transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           Kembali ke Website
@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
 
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto w-14 h-14 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center mb-4">
+            <div className="mx-auto w-14 h-14 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl flex items-center justify-center mb-4">
               <Lock className="w-7 h-7 text-white" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900">
@@ -123,7 +123,7 @@ export default function AdminLoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold"
+                className="w-full h-11 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-semibold"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">

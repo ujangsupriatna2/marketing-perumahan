@@ -223,7 +223,7 @@ export default function UsersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Manajemen User</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola akun admin ({admins.length} user)</p>
         </div>
-        <Button onClick={openCreate} className="bg-red-600 hover:bg-red-700 text-white gap-2">
+        <Button onClick={openCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
           <Plus className="w-4 h-4" /> Tambah User
         </Button>
       </div>
@@ -268,7 +268,7 @@ export default function UsersPage() {
                         <TableCell className="font-medium">{a.name}</TableCell>
                         <TableCell className="text-gray-500">{a.email}</TableCell>
                         <TableCell>
-                          <Badge variant={a.role === "superadmin" ? "default" : "secondary"} className={a.role === "superadmin" ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700"}>
+                          <Badge variant={a.role === "superadmin" ? "default" : "secondary"} className={a.role === "superadmin" ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700"}>
                             <Shield className="w-3 h-3 mr-1" />
                             {a.role === "superadmin" ? "Superadmin" : "Admin"}
                           </Badge>
@@ -423,7 +423,7 @@ export default function UsersPage() {
 
           <DialogFooter className="pt-0 gap-2">
             <Button variant="outline" onClick={() => setFormOpen(false)} className="h-8 text-sm">Batal</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-red-600 hover:bg-red-700 text-white h-8 text-sm px-4">
+            <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white h-8 text-sm px-4">
               {saving && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
               {editing ? "Simpan" : "Tambah"}
             </Button>

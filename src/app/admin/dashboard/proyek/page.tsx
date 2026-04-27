@@ -687,7 +687,7 @@ export default function ProyekPage() {
           <h1 className="text-2xl font-bold text-gray-900">Proyek</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola listing properti / proyek perumahan</p>
         </div>
-        <Button onClick={openCreate} className="bg-red-600 hover:bg-red-700 text-white gap-2">
+        <Button onClick={openCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
           <Plus className="w-4 h-4" /> Tambah Proyek
         </Button>
       </div>
@@ -799,7 +799,7 @@ export default function ProyekPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
-                              <Button variant="ghost" size="icon" onClick={() => openEdit(p)} className="text-gray-400 hover:text-red-600">
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(p)} className="text-gray-400 hover:text-indigo-600">
                                 <Pencil className="w-4 h-4" />
                               </Button>
                               <Button variant="ghost" size="icon" onClick={() => openDelete(p)} className="text-gray-400 hover:text-red-600">
@@ -1106,7 +1106,7 @@ export default function ProyekPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFormOpen(false)}>Batal</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-red-600 hover:bg-red-700 text-white">
+            <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {editing ? "Simpan" : "Tambah"}
             </Button>

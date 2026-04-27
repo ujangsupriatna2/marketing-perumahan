@@ -198,7 +198,7 @@ export default function BlogPage() {
           <h1 className="text-2xl font-bold text-gray-900">Blog</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola artikel blog</p>
         </div>
-        <Button onClick={openCreate} className="bg-red-600 hover:bg-red-700 text-white gap-2">
+        <Button onClick={openCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
           <Plus className="w-4 h-4" /> Tambah Artikel
         </Button>
       </div>
@@ -410,7 +410,7 @@ export default function BlogPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setFormOpen(false)}>Batal</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-red-600 hover:bg-red-700 text-white">
+            <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white">
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {editing ? "Simpan" : "Tambah"}
             </Button>

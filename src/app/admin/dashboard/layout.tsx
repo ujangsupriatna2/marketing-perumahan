@@ -106,7 +106,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
               isActive
-                ? "bg-red-600 text-white shadow-lg shadow-red-600/30"
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
                 : "text-gray-300 hover:bg-gray-800 hover:text-white"
             )}
             title={collapsed ? item.label : undefined}
@@ -139,7 +139,7 @@ function SidebarContent({ showCollapseToggle = true }: { showCollapseToggle?: bo
             className="w-9 h-9 rounded-xl object-contain shrink-0 bg-white/10"
           />
         ) : (
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 to-amber-500 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-400 flex items-center justify-center shrink-0">
             <Building2 className="w-5 h-5 text-white" />
           </div>
         )}
@@ -235,7 +235,7 @@ function Header() {
         </button>
 
         <div className="flex items-center gap-2 text-sm">
-          <a href="/?tab=home" className="text-gray-400 hover:text-red-600 transition-colors">
+          <a href="/?tab=home" className="text-gray-400 hover:text-indigo-600 transition-colors">
             <Home className="w-4 h-4" />
           </a>
           <span className="text-gray-300">/</span>
@@ -251,7 +251,7 @@ function Header() {
               <Skeleton className="w-8 h-8 rounded-full" />
             ) : (
               <Avatar className="w-8 h-8">
-                <AvatarFallback className="bg-red-600 text-white text-xs font-semibold">
+                <AvatarFallback className="bg-indigo-600 text-white text-xs font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -262,7 +262,7 @@ function Header() {
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className={`inline-block px-1.5 py-0.5 text-[10px] font-semibold rounded-md leading-none ${
                     isSuperadmin(role)
-                      ? "bg-red-100 text-red-700"
+                      ? "bg-indigo-100 text-indigo-700"
                       : "bg-gray-100 text-gray-500"
                   }`}>
                     {isSuperadmin(role) ? "Super Admin" : "Admin"}
