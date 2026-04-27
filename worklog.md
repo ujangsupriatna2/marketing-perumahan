@@ -239,3 +239,53 @@ Stage Summary:
 - Login page, dashboard layout, all CRUD pages, kalkulator, and pengaturan updated
 - Red color only used for semantic purposes: errors, delete actions, validation, danger states
 - 0 new lint errors from changes
+
+---
+Task ID: 8
+Agent: Main
+Task: Clean up old display — complete rewrite of page.tsx, globals.css, chatbot, and map-wrapper with silver/indigo theme
+
+Work Log:
+- Discovered the previous force push disaster had wiped the new silver/indigo design
+- page.tsx was still 3884 lines of OLD code using ?tab= navigation
+- globals.css still had old red/gold theme
+- chatbot.tsx still had red colors
+- map-wrapper.tsx still had red spinner
+
+- Completely rewrote globals.css (248→296 lines):
+  - Silver color palette: #F8F9FA, #EEF0F2, #DDE1E6
+  - Indigo accent: #6366F1, #818CF8, #4F46E5
+  - New animations: float-slow, float-reverse, orbit, pulse-glow, gradient-shift, mesh-move, scale-in, slide-in-right, marquee-scroll
+  - Glassmorphism classes: .glass, .glass-dark, .glass-nav, .glass-card
+  - Hero mesh: .hero-mesh, .hero-orb
+  - Utilities: .gradient-accent, .gradient-dark-hero, .gradient-footer, .btn-glow, .card-lift
+  - .skeleton-shimmer, .marquee-container, .marquee-track
+
+- Completely rewrote page.tsx (3884→2437 lines, -1447 lines):
+  - Removed ALL old code (Hero, PromoStrip, FeaturesSection, TentangKamiKeunggulanSection, PropertyPreviewSection, CaraBeliSection, CalculatorSection, LocationSection, FAQSection, GalleryPreviewSection, CTASection, BlogPreviewSection, PageBanner, PropertyCard, PropertiesSection, LightboxOverlay, PropertyGallery, PropertyDetailDialog, ProyekGallery, TentangKamiPage, BlogArticlePage, BlogPage, KontakPage, GalleryPage, ProyekPage)
+  - New query param navigation: ?beranda, ?tentang, ?mitra, ?blog, ?kontak
+  - AnimatePresence with mode="wait" for smooth transitions
+  - 5 complete views:
+    1. BerandaView: Hero with S.hero_bg_image background, count-up stats, trust marquee, services grid, featured properties, blog preview, testimonials, CTA banner
+    2. TentangView: "Cerita Kami" with S.tentangkami_image, core values, vision/mission, stats, CTA
+    3. MitraView: Search/filter, property grid, property detail Dialog, "Jadi Mitra" CTA
+    4. BlogView: Featured article, blog grid, pagination, popular posts sidebar, WhatsApp CTA sidebar
+    5. KontakView: Contact form (WhatsApp), info cards, social media, MapWrapper, FAQ accordion
+  - Shared components: Navbar (glass-morphism, mobile hamburger), Footer (4-column dark gradient), PageHeader, FadeIn, StatCounter, formatRupiah
+  - Only 2 images from settings: S.hero_bg_image (hero background) and S.tentangkami_image (tentang side image)
+
+- Rewrote chatbot.tsx (448→448 lines, all red→indigo):
+  - FAB, menu, chat panel all updated to indigo theme
+
+- Updated map-wrapper.tsx:
+  - Loading spinner: border-red-200/border-t-red-600 → border-indigo-200/border-t-indigo-600
+
+- Verified: 0 new lint errors, page compiles HTTP 200, 61,454 bytes response
+- Pushed to GitHub as commit 738682d
+
+Stage Summary:
+- Complete cleanup: all old display code removed, replaced with new silver/indigo multi-view design
+- 4 files changed: globals.css, page.tsx, chatbot.tsx, map-wrapper.tsx
+- 2398 insertions, 3701 deletions (net -1303 lines)
+- Banner images from settings now correctly rendered: S.hero_bg_image (Beranda) and S.tentangkami_image (Tentang)
+- Dev server compiles and serves page successfully (HTTP 200)
