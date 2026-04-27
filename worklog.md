@@ -162,3 +162,37 @@ Stage Summary:
 - Glassmorphism navbar with active state highlighting
 - All existing data fetching patterns and types preserved
 - Chatbot and settings store integration maintained
+
+---
+Task ID: 6
+Agent: Main
+Task: Fix navigation issues and ensure all 5 page views are fully complete
+
+Work Log:
+- Read entire page.tsx file (~1786 lines) to audit all 5 views and navigation patterns
+- Identified issues:
+  1. PageHeader component (line 211) used `window.location.href = "/?beranda"` causing full page reloads
+  2. All views using PageHeader (TentangView, MitraView, BlogView, KontakView) lacked access to router
+  3. BlogView had two "Kembali ke Beranda" buttons also using `router.push("/?beranda")` instead of the centralized navigate function
+
+- Applied fixes:
+  1. Added optional `navigate` prop to PageHeader component signature
+  2. Updated breadcrumb button to use `navigate ? navigate("beranda") : window.location.href = "/?beranda"` with fallback
+  3. Added `navigate` prop to TentangView, MitraView, BlogView, KontakView components
+  4. Passed `navigate={navigate}` prop to all PageHeader usages in these 4 views
+  5. Replaced two `router.push("/?beranda")` calls in BlogView with `navigate("beranda")`
+  6. Updated HomePageInner to pass `navigate` prop to TentangView, MitraView, BlogView, and KontakView
+
+- Verified:
+  - All 5 views are complete: BerandaView (hero, marquee, services, featured mitra, blog preview, testimonials, CTA), TentangView (story, values, vision/mission, stats, CTA), MitraView (search, stats, grid, CTA), BlogView (featured, grid, pagination, sidebar), KontakView (form, info cards, map, socials)
+  - AnimatePresence mode="wait" with key props on all views confirmed working
+  - /api/testimonials endpoint exists and is properly fetched
+  - The img tag on line 912 was NOT truncated (className="w-full h-[400px] object-cover" is complete)
+  - Lint check: 0 new errors (only pre-existing errors in prisma/seed.js and admin/pengaturan)
+  - Dev server: Compiles successfully, page loads with 200 status
+
+Stage Summary:
+- Fixed PageHeader to use SPA navigation instead of full page reloads
+- All 4 non-beranda views now receive and use the navigate prop for SPA routing
+- BlogView's "Kembali ke Beranda" buttons now use navigate instead of direct router.push
+- All navigation uses centralized navigate function via router.push for consistent SPA behavior
