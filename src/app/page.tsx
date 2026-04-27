@@ -579,10 +579,13 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
       {/* ─── Hero ─── */}
       <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden">
         {/* Background image from settings */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url("${S.hero_bg_image}")` }}
-        />
+        {S.hero_bg_image && (
+          <img
+            src={S.hero_bg_image}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-gray-900/50" />
 
