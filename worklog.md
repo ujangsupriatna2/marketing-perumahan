@@ -83,3 +83,33 @@ Stage Summary:
 - PDF download feature completely removed from both KPR and Syariah calculators
 - Print button remains functional — users can save as PDF via browser's "Save as PDF" printer option
 - No lint errors introduced
+
+---
+Task ID: 4
+Agent: Main
+Task: Redesign blog listing page with featured article, sidebar, pagination (matching reference design)
+
+Work Log:
+- Analyzed uploaded reference image (blog listing from ITS Academic) for layout design
+- Updated `/api/blogs` API to support `sort` query parameter (supports "popular" sorting by views desc)
+- Completely redesigned the `?blog` view in `page.tsx` with:
+  - 2-column layout: main content area (left, 2/3) + sidebar (right, 1/3)
+  - Featured article hero card (first article on page 1) - horizontal card with image + content
+  - Remaining articles in 2-column grid (8 per page on page 1, 9 on subsequent pages)
+  - "Postingan Populer" sidebar widget showing top 5 posts sorted by views
+  - "Butuh Konsultasi?" CTA sidebar widget with WhatsApp link
+  - Page pagination controls: prev/next buttons + numbered page buttons
+  - Loading skeleton matching the 2-column layout
+  - Gold (#B8860B) category badges on blog cards
+  - View count (Eye icon) display on all blog cards
+- Changed blog nav link to properly use `router.push("/?blog")` instead of just scroll
+- Added `turbopack.root` config for local dev compatibility
+- Installed dependencies with bun install
+- Committed as `869d7f5` and pushed to GitHub
+
+Stage Summary:
+- Blog listing page (`?blog`) redesigned with professional 2-column layout
+- Featured article hero card + grid layout + popular posts sidebar + pagination
+- 9 articles per page with server-side pagination via API
+- API supports `sort=popular` parameter for sidebar popular posts
+- All changes committed and pushed to GitHub
