@@ -58,7 +58,6 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
   loading: false,
   initialized: false,
   fetchSettings: async () => {
-    if (get().initialized) return;
     set({ loading: true });
     try {
       const res = await fetch("/api/settings");
