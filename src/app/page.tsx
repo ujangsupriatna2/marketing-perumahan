@@ -212,7 +212,7 @@ function Navbar({
   const S = useSettingsStore((s) => s.settings);
 
   const links: { label: string; view: ViewName }[] = [
-    { label: "Beranda", view: "beranda" },
+    { label: "Home", view: "beranda" },
     { label: "Tentang", view: "tentang" },
     { label: "Mitra", view: "mitra" },
     { label: "Blog", view: "blog" },
@@ -345,7 +345,7 @@ function Footer({ navigate }: { navigate: (v: ViewName) => void }) {
   const S = useSettingsStore((s) => s.settings);
 
   const navLinks = [
-    { label: "Beranda", view: "beranda" as ViewName },
+    { label: "Home", view: "beranda" as ViewName },
     { label: "Tentang Kami", view: "tentang" as ViewName },
     { label: "Mitra & Proyek", view: "mitra" as ViewName },
     { label: "Blog", view: "blog" as ViewName },
@@ -549,7 +549,7 @@ function PageHeader({
               }}
               className="hover:text-indigo-400 transition-colors"
             >
-              Beranda
+              Home
             </button>
             <ChevronRight className="w-4 h-4" />
             <span className="text-indigo-400">{title}</span>
@@ -577,21 +577,68 @@ function BerandaView({ navigate }: { navigate: (v: ViewName) => void }) {
   return (
     <motion.div {...pageTransition} className="overflow-hidden">
       {/* ─── Hero ─── */}
-      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden">
-        {/* Background image from settings */}
-        {S.hero_bg_image && (
-          <img
-            src={S.hero_bg_image}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        )}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-gray-900/50" />
+      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950">
+        {/* Animated grid background */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }} />
 
-        {/* Decorative orbs */}
-        <div className="hero-orb w-72 h-72 bg-indigo-500 top-[10%] right-[15%]" />
-        <div className="hero-orb w-48 h-48 bg-indigo-400 bottom-[10%] right-[30%]" />
+        {/* Animated floating orbs */}
+        <motion.div
+          animate={{ x: [0, 30, -20, 0], y: [0, -40, 20, 0], scale: [1, 1.1, 0.95, 1] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute w-[500px] h-[500px] rounded-full bg-indigo-600/20 blur-[100px] top-[-10%] right-[-5%]"
+        />
+        <motion.div
+          animate={{ x: [0, -30, 20, 0], y: [0, 30, -30, 0], scale: [1, 0.95, 1.1, 1] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute w-[400px] h-[400px] rounded-full bg-violet-500/15 blur-[100px] bottom-[-5%] left-[-5%]"
+        />
+        <motion.div
+          animate={{ x: [0, 20, -10, 0], y: [0, -20, 10, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute w-[300px] h-[300px] rounded-full bg-indigo-400/10 blur-[80px] top-[40%] right-[25%]"
+        />
+
+        {/* Animated particles */}
+        {Array.from({ length: 20 }).map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              y: [0, -30 - Math.random() * 40, 0],
+              opacity: [0, 0.6 + Math.random() * 0.4, 0],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+              ease: "easeInOut",
+            }}
+            className="absolute w-1 h-1 rounded-full bg-indigo-400/60"
+            style={{
+              left: `${10 + Math.random() * 80}%`,
+              top: `${20 + Math.random() * 60}%`,
+            }}
+          />
+        ))}
+
+        {/* Animated geometric shapes */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[15%] right-[15%] w-40 h-40 border border-indigo-500/10 rounded-2xl hidden lg:block"
+        />
+        <motion.div
+          animate={{ rotate: -360 }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          className="absolute bottom-[20%] right-[30%] w-24 h-24 border border-violet-500/10 rounded-full hidden lg:block"
+        />
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[60%] right-[10%] w-16 h-16 border border-indigo-400/10 rounded-lg hidden lg:block"
+        />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="max-w-2xl">
